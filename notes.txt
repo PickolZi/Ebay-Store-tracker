@@ -1,0 +1,9 @@
+Objective: Create a tool that Eddy and Allan can use to track the items sold on other ebay accounts. 
+
+Functionality: 
+	- Scrapes ebay data from other sellers.
+	- Scrapes atleast once a day and compares data each time to see what sold. Cronjob
+	- Keep track of title, listed date, price, url, location, seller
+	- Have a table of sellers I want to keep track of
+	- For each seller, display a something similar to a "Shopify Analyitics dashboard" showing the highs and lows for the days, how much they've made, and etc.
+	- Be able to see what sold on what day
