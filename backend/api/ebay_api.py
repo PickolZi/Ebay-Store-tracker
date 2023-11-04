@@ -70,28 +70,34 @@ def getAllEbayDataFromStores(store, page=1, output=[], minPrice=None, maxPrice=N
 
     num_of_pages = int(json_data['findItemsIneBayStoresResponse']['paginationOutput']['totalPages'])
 
-    ebay_items = json_data['findItemsIneBayStoresResponse']['searchResult']['item']
-    for item in ebay_items:
-        item_id = item['itemId']
-        title = item['title'].replace("'", "")
-        listed_date = item['listingInfo']['startTime'].replace("T", " ")[:-1]
-        price = item['sellingStatus']['currentPrice']['#text']
-        item_url = item['viewItemURL']
-        image_url = item['galleryURL'].replace('l140', 'l1600')
-        location = item['location'].replace("'", "")
-        status = item['sellingStatus']['sellingState']
+    try:
+        ebay_items = json_data['findItemsIneBayStoresResponse']['searchResult']['item']
+        for item in ebay_items:
+            item_id = item['itemId']
+            title = item['title'].replace("'", "")
+            listed_date = item['listingInfo']['startTime'].replace("T", " ")[:-1]
+            price = item['sellingStatus']['currentPrice']['#text']
+            item_url = item['viewItemURL']
+            image_url = item['galleryURL'].replace('l140', 'l1600')
+            location = item['location'].replace("'", "")
+            status = item['sellingStatus']['sellingState']
 
-        output.append({
-            'item_id': item_id,
-            'title': title,
-            'listed_date': listed_date,
-            'price': price,
-            'item_url': item_url,
-            'image_url': image_url,
-            'location': location,
-            'status': status
-        })
-    print(f"Got page {page} / {num_of_pages} from ebay API")
+            output.append({
+                'item_id': item_id,
+                'title': title,
+                'listed_date': listed_date,
+                'price': price,
+                'item_url': item_url,
+                'image_url': image_url,
+                'location': location,
+                'status': status
+            })
+        print(f"Got page {page} / {num_of_pages} from ebay API")
+    except TypeError:
+        print(json_data)
+        print("Error with the response from ebay api?")
+        input("Pausing....")
+
 
     if page == num_of_pages or page == 100:
         return output
