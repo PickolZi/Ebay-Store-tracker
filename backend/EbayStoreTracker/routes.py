@@ -7,7 +7,7 @@ main = Blueprint("main", __name__)
 
 @main.route("/")
 def index():
-    return "Nyahallo world~!"
+    return "Ebay Store Tracker Development Site"
 
 # End points
 @main.route("/getAllStores")
