@@ -131,8 +131,10 @@ def updateSpecificPartFromEbayItems(store, attributes=[]):
 
 
 if __name__ == "__main__":
+    dailyUpdateDatabaseFromEbay("Basset Auto Wreckers")
     dailyUpdateDatabaseFromEbay("PARTS THAT FIT LLC")
-    # dailyUpdateDatabaseFromEbay("Basset Auto Wreckers")
+    # dailyUpdateDatabaseFromEbay("M&amp;M Auto Parts, Inc.")
+    
     # print(getIdFromStoreName("PARTS THAT FIT LLC"))
     # updateSpecificPartFromEbayItems("Basset Auto Wreckers", ['item_url'])
     # print(datetime.now())

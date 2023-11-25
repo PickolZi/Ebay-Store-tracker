@@ -20,7 +20,6 @@ headers = {
 def pretty_print_json(json_data):
     print(json.dumps(json_data, indent=5))
 
-
 def getAllEbayDataFromStores(store, page=1, output=[], minPrice=None, maxPrice=None):
     # Gets all items an ebay store seller has.
     # params: store => ebay store name.
@@ -106,12 +105,12 @@ def getAllEbayDataFromStores(store, page=1, output=[], minPrice=None, maxPrice=N
     return output[:]
 
 def areSoldItems(total_ebay_ids):
-    # Given the ebay item ids, return if the item has been sold/completed.
-    # params: ebay_id => [int]
+    # Given a list of ebay item ids, return if the item has been sold/completed.
+    # params: total_ebay_ids => [int]
     # returns: dictionary with the key being the ids and values being booleans.
     results = {}
 
-    # API request
+    # API request headers
     headers["X-EBAY-API-IAF-TOKEN"] = f"Bearer {cred['userToken']}"
     headers["X-EBAY-API-SITE-ID"] = "0"
     headers["X-EBAY-API-CALL-NAME"] = "GetItemStatus"
@@ -136,11 +135,17 @@ def areSoldItems(total_ebay_ids):
 
         response = requests.post(EBAY_SHOPPING_GET_ITEMS_ENDPOINT, data=body, headers=headers)
         json_data = xmlToJsonParser(response.text)["GetItemStatusResponse"]
+
         # Handling Errors
         RESPONSE_CODES = ["Success", "PartialFailure", "Failure"]
         SERVER_RESPONSE_CODE = json_data["Ack"]
-
+        
         if SERVER_RESPONSE_CODE == RESPONSE_CODES[2]:
+            SERVER_ERROR_SHORT_MESSAGE = json_data["Errors"]["ShortMessage"]
+            if SERVER_ERROR_SHORT_MESSAGE == "Invalid token.":
+                print("Token is invalid. Please try using another application token.")
+            else:
+                print("All ebay item ids were invalid.")
             print("Failed to retrieve any sold ebay items.")
             return False
         elif SERVER_RESPONSE_CODE == RESPONSE_CODES[1]:
@@ -160,7 +165,6 @@ def areSoldItems(total_ebay_ids):
             results[item_id] = (status != "Active")
 
     return results
-
 
 def isValidStore(store):
     # Given the store name, return if it's a valid store name on ebay or not.
@@ -184,15 +188,20 @@ def isValidStore(store):
     return status == "Success"
 
 
-
 if __name__ == "__main__":
-    # ebayItems = getAllEbayDataFromStores("Basset Auto Wreckers", minPrice=50)
+    ebayItems = getAllEbayDataFromStores("Basset Auto Wreckers", minPrice=200)
+    print(ebayItems)
 
     x = [295778007334, 293691222982, 295705847685, 293582067774, 295459132336, 295464479330, 295478218835, 292727410224, 304804608243, 295791717743, 293120981956, 292713027082, 304500674113, 305214724014, 295705848289, 295329815173, 303477230115, 292713029569, 305124992789, 304792061331, 294279016350, 305078758459, 293567361848, 293792614665, 294749552524, 303968684831, 304973884654, 303908610702, 295025220445, 292745732411, 304902130710, 295646269195, 302871738062, 303561012266, 304129675761, 303795842298, 304903784487, 295961818315, 294227051986, 304201244737, 304736576101, 304379008928, 295453761114, 304698535151, 295704837569, 304834615878, 295900176773, 292732126285, 303252154280, 295089282585, 305004819413, 304924057588, 304229165193, 294029830457, 304829658454, 293957015254, 295555457840, 304897053580, 295743731292, 304944751849, 292943552901, 295567199095, 304758480640, 304914935097, 304813455855, 302932605797, 302883362428, 293721343139, 293995676248, 295038220376, 304959603170, 304555601837, 304140435740, 295769749473]
 
-    pretty_print_json(areSoldItems(x))
+    # True, True, False, False, N/A, N/A
+    y = [304758480640, 302932605797, 304959603170, 304555601837, 38290138190, 890458309]
+
+    # pretty_print_json(areSoldItems(x))
+    # pretty_print_json(areSoldItems(y))
 
     # print(isValidStore("PARTS THAT FIT LLC"))
+    # print(isValidStore("M&amp;M Auto Parts, Inc."))
     # for ebayItem in ebayItems:
     #     pretty_print_json(ebayItem)
     # print("Total Items:", len(ebayItems))
