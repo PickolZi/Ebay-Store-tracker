@@ -15,6 +15,7 @@ class Items(db.Model):
     title = db.Column("title", db.String)
     listed_date = db.Column("listed_date", db.DateTime)
     date_last_updated = db.Column("date_last_updated", db.DateTime, default=datetime.utcnow)
+    date_sold = db.Column("date_sold", db.DateTime)
     price = db.Column("price", db.Float)
     item_url = db.Column("item_url", db.String)
     image_url = db.Column("image_url", db.String)

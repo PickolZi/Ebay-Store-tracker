@@ -38,9 +38,11 @@ def dailyUpdateDatabaseFromEbay(store):
     store_id = getIdFromStoreName(store)
 
     # For stores with more than 10k parts(100 entries for 100 pages). I can not call pages after 100, so I have to break up api call and filter by price so pages are less than 100.
-    ebay_items = []
-    ebay_items.extend(getAllEbayDataFromStores(store, maxPrice=49.99))
-    ebay_items.extend(getAllEbayDataFromStores(store, minPrice=50))
+    ebay_items = getAllEbayDataFromStores(store)
+    if not ebay_items:
+        print("Error occured when getting items from ebay api.")
+        print(f"Stopping daily update for {store}")
+        return
 
     # Connecting to database.
     con = sqlite3.connect(DATABASE)
@@ -52,6 +54,7 @@ def dailyUpdateDatabaseFromEbay(store):
         item_id = ebay_item['item_id']
         title = ebay_item['title']
         listed_date = ebay_item['listed_date']
+        date_sold = ebay_item['date_sold']
         price = ebay_item['price']
         item_url = ebay_item['item_url']
         image_url = ebay_item['image_url']
@@ -64,7 +67,7 @@ def dailyUpdateDatabaseFromEbay(store):
         """)
 
         cur.execute(f"""
-        INSERT INTO items VALUES ({item_id}, '{title}', '{listed_date}', '{datetime.now()}', {price}, '{item_url}', '{image_url}', '{location}', '{status}', {store_id});
+        INSERT INTO items VALUES ({item_id}, '{title}', '{listed_date}', '{datetime.now()}', '{date_sold}', {price}, '{item_url}', '{image_url}', '{location}', '{status}', {store_id});
         """)
         print(f"Inserted {index+1} / {len(ebay_items)} into items database. item id: {item_id}")
 
@@ -81,9 +84,11 @@ def dailyUpdateDatabaseFromEbay(store):
         for ebay_id, bool_val in sold_items_map.items():
             if bool_val:
                 # Update items that weren't updated recently, into "sold" status.
+                date_sold = bool_val.replace("Z", "")
+                print(f"Ebay Item: {ebay_id} sold on {date_sold}")
                 cur.execute(f"""
                 UPDATE items 
-                SET status="Sold"
+                SET status="Sold", date_sold="{date_sold}"
                 WHERE item_id={ebay_id} and store_id={store_id}
                 """)
 
@@ -131,8 +136,8 @@ def updateSpecificPartFromEbayItems(store, attributes=[]):
 
 
 if __name__ == "__main__":
-    dailyUpdateDatabaseFromEbay("Basset Auto Wreckers")
-    dailyUpdateDatabaseFromEbay("PARTS THAT FIT LLC")
+    # dailyUpdateDatabaseFromEbay("Basset Auto Wreckers")
+    # dailyUpdateDatabaseFromEbay("PARTS THAT FIT LLC")
     # dailyUpdateDatabaseFromEbay("M&amp;M Auto Parts, Inc.")
     
     # print(getIdFromStoreName("PARTS THAT FIT LLC"))

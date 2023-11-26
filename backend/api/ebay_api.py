@@ -66,6 +66,7 @@ def addEbayItemToList(ebay_items, output_list):
             item_id = item['itemId']
             title = item['title'].replace("'", "")
             listed_date = item['listingInfo']['startTime'].replace("T", " ")[:-1]
+            date_sold = ""
             price = item['sellingStatus']['currentPrice']['#text']
             item_url = item['viewItemURL']
             image_url = item['galleryURL'].replace('l140', 'l1600') if item.get('galleryURL') else "N/A"
@@ -76,6 +77,7 @@ def addEbayItemToList(ebay_items, output_list):
                 'item_id': item_id,
                 'title': title,
                 'listed_date': listed_date,
+                'date_sold': date_sold,
                 'price': price,
                 'item_url': item_url,
                 'image_url': image_url,
@@ -175,17 +177,16 @@ def getAllEbayDataFromStores(store):
         maxPrice = price[1]
         loadEbayItemsWithinRange(store, headers, minPrice, maxPrice, output)
 
+    # for ebay_item in output:
+    #     pretty_print_json(ebay_item)
 
-    for ebay_item in output:
-        pretty_print_json(ebay_item)
-
-    print(f"Len of output: {len(output)}")
+    print(f"#of items pulled from ebay api: {len(output)}")
     return output
 
 def areSoldItems(total_ebay_ids):
     # Given a list of ebay item ids, return if the item has been sold/completed.
     # params: total_ebay_ids => [int]
-    # returns: dictionary with the key being the ids and values being booleans.
+    # returns: dictionary with the key being the ids and values being sold date if True, or False.
     results = {}
 
     # API request headers
@@ -240,7 +241,11 @@ def areSoldItems(total_ebay_ids):
             item_id = ebay_item['ItemID']
             status = ebay_item['ListingStatus']
 
-            results[item_id] = (status != "Active")
+            if status != "Active":
+                sold_date = ebay_item['EndTime']
+                results[item_id] = sold_date    
+            else:
+                results[item_id] = False
 
     return results
 
@@ -267,7 +272,7 @@ def isValidStore(store):
 
 
 if __name__ == "__main__":
-    ebayItems = getAllEbayDataFromStores("Basset Auto Wreckers")
+    # ebayItems = getAllEbayDataFromStores("Basset Auto Wreckers")
     # ebayItems = getAllEbayDataFromStores("PARTS THAT FIT LLC")
     # ebayItems = getAllEbayDataFromStores("M&amp;M Auto Parts, Inc.")
     # print(ebayItems)
@@ -276,7 +281,9 @@ if __name__ == "__main__":
 
     # True, True, False, False, N/A, N/A
     y = [304758480640, 302932605797, 304959603170, 304555601837, 38290138190, 890458309]
-    # areSoldItems(y)
+    # y = [304758480640, 302932605797]
+    print(areSoldItems(y))
+
 
     # pretty_print_json(areSoldItems(x))
     # pretty_print_json(areSoldItems(y))
