@@ -1,10 +1,11 @@
 # Functions used to propogate database using ebay's api calls will be called here
+import os
 import sqlite3
 from datetime import datetime, timedelta
 
 from ebay_api import getAllEbayDataFromStores, isValidStore, areSoldItems, pretty_print_json
 
-DATABASE = "../instance/db.sqlite3"
+DATABASE = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "instance/db.sqlite3"))
 
 def getIdFromStoreName(store):
     # Find the store id given the store name
@@ -95,52 +96,24 @@ def dailyUpdateDatabaseFromEbay(store):
     con.commit()
     con.close()
 
-def updateSpecificPartFromEbayItems(store, attributes=[]):
-    # Calls getAllEbayDataFromStores() and will update attributes of the ebay item provided by the arguments. Will not update date_last_updated unless specified.
-    # params: attributes => [Strings] list of strings. Strings will be the attribute name of the items table to be updated.
-    # Return nothing. Updates database. 
-
-    sample_attributes = ['item_id', 'title', 'listed_date', 'date_last_updated', 'price', 'item_url', 'image_url', 'location', 'status', 'store_id']
-
-    if not attributes:
-        print("empty attributes, please add database items attributes to attributes list.")
-        return False
-
-    for attribute in attributes:
-        if attribute not in sample_attributes:
-            print(f"Attribute: {attribute} not in sample_attributes list.")
-            return False
-
-    # Connecting to database.
+def dailyUpdateAllStores():
+    # Grabs all stores from database and runs dailyUpdateDatabaseFromEbay() on all stores.
     con = sqlite3.connect(DATABASE)
     cur = con.cursor()
+    
+    res = cur.execute("""
+    SELECT * FROM stores;
+    """)
 
-    ebay_items = getAllEbayDataFromStores(store)
+    stores = res.fetchall()
 
-    for index, ebay_item in enumerate(ebay_items):
-        sql_query = "UPDATE items SET "
-
-        for attribute in attributes:
-            if attribute in ['title', 'listed_date', 'item_url', 'image_url', 'location', 'status']:  # If datatype is string, add quotes around.
-                sql_query += f"{attribute}='{ebay_item[attribute]}' "
-            else:
-                sql_query += f"{attribute}={ebay_item[attribute]} "
-            
-        sql_query += f"WHERE item_id={item_id}"
-        cur.execute(sql_query)
-        print(f"Updated item {index+1} / {len(ebay_items)}. Item ID: {item_id}")
-
-    con.commit()
-    con.close()
-    print(f"Finished updating {len(ebay_items)} items.")
+    for store_number, store in stores:
+        print(f"{store_number}/{len(stores)}: Running daily update on {store}")
+        dailyUpdateDatabaseFromEbay(store)
 
 
 if __name__ == "__main__":
+    # dailyUpdateAllStores()
     # dailyUpdateDatabaseFromEbay("Basset Auto Wreckers")
     # dailyUpdateDatabaseFromEbay("PARTS THAT FIT LLC")
-    # dailyUpdateDatabaseFromEbay("M&amp;M Auto Parts, Inc.")
-    
-    # print(getIdFromStoreName("PARTS THAT FIT LLC"))
-    # updateSpecificPartFromEbayItems("Basset Auto Wreckers", ['item_url'])
-    # print(datetime.now())
-    pass
+    dailyUpdateDatabaseFromEbay("M&amp;M Auto Parts, Inc.")

@@ -1,12 +1,15 @@
 # Anything that calls the ebay API will be held in this file.
 import requests
 import json
+import os
+import base64
 
 from xmlToJson import xmlToJsonParser
 
 
+SECRETS_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "SECRETS.json"))
 # Load ebay API keys from SECRETS.json
-with open("../SECRETS.json", "r") as f:
+with open(SECRETS_PATH, "r") as f:
     cred = json.load(f)
 
 EBAY_GET_ITEMS_ENDPOINT = "https://svcs.ebay.com/services/search/FindingService/v1" 
@@ -220,6 +223,7 @@ def areSoldItems(total_ebay_ids):
         SERVER_RESPONSE_CODE = json_data["Ack"]
         
         if SERVER_RESPONSE_CODE == RESPONSE_CODES[2]:
+            pretty_print_json(json_data)
             SERVER_ERROR_SHORT_MESSAGE = json_data["Errors"]["ShortMessage"]
             if SERVER_ERROR_SHORT_MESSAGE == "Invalid token.":
                 print("Token is invalid. Please try using another application token.")
@@ -270,7 +274,37 @@ def isValidStore(store):
     status = json_data['findItemsIneBayStoresResponse']['ack']
     return status == "Success"
 
+def generateApplicationAccessToken():
+    # A lot easier than generating a user refresh/access token because doesn't require the user to signin.
+    # https://developer.ebay.com/api-docs/static/oauth-client-credentials-grant.html
+    # Uses 1) Endpoint 2) Headers 3) Body in order to create a new access token that lasts 2 hours.
+    authorization_string = f"{cred['appid']}:{cred['certid']}"  # Gets the client_id:client_secret
+    authorization_string = authorization_string.encode("ascii")  # Encodes in ascii
+    authorization_string = base64.b64encode(authorization_string)  # Uses base64 to encode 
+    authorization_string = authorization_string.decode("ascii")  # Decodes in ascii
 
+    TOKEN_ENDPOINT = "https://api.ebay.com/identity/v1/oauth2/token"
+    HEADERS = {
+        "Content-Type": "application/x-www-form-urlencoded",
+        "Authorization": f"Basic {authorization_string}"
+    }
+    BODY = {
+        "grant_type": "client_credentials",
+        "scope": "https://api.ebay.com/oauth/api_scope"
+    }
+    res = requests.post(TOKEN_ENDPOINT, headers=HEADERS, data=BODY)
+    json_data = json.loads(res.text)
+    access_token = json_data.get("access_token")
+
+    if access_token:
+        cred['userToken'] = access_token
+        headers['Authorization'] = access_token
+    else:
+        print("Failed to get access token. Investigate further...")
+        return False
+
+
+generateApplicationAccessToken()  # Generates application access key.
 if __name__ == "__main__":
     # ebayItems = getAllEbayDataFromStores("Basset Auto Wreckers")
     # ebayItems = getAllEbayDataFromStores("PARTS THAT FIT LLC")
@@ -281,16 +315,5 @@ if __name__ == "__main__":
 
     # True, True, False, False, N/A, N/A
     y = [304758480640, 302932605797, 304959603170, 304555601837, 38290138190, 890458309]
-    # y = [304758480640, 302932605797]
-    print(areSoldItems(y))
-
-
     # pretty_print_json(areSoldItems(x))
     # pretty_print_json(areSoldItems(y))
-
-    # print(isValidStore("PARTS THAT FIT LLC"))
-    # print(isValidStore("M&amp;M Auto Parts, Inc."))
-    # for ebayItem in ebayItems:
-    #     pretty_print_json(ebayItem)
-    # print("Total Items:", len(ebayItems))
-    pass
