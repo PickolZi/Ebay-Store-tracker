@@ -68,7 +68,7 @@ def dailyUpdateDatabaseFromEbay(store):
         """)
 
         cur.execute(f"""
-        INSERT INTO items VALUES ({item_id}, '{title}', '{listed_date}', '{datetime.now()}', '{date_sold}', {price}, '{item_url}', '{image_url}', '{location}', '{status}', {store_id});
+        INSERT INTO items VALUES ({item_id}, '{title}', '{listed_date}', '{datetime.now()}', NULL, {price}, '{item_url}', '{image_url}', '{location}', '{status}', {store_id});
         """)
         print(f"Inserted {index+1} / {len(ebay_items)} into items database. item id: {item_id}")
 
@@ -113,7 +113,7 @@ def dailyUpdateAllStores():
 
 
 if __name__ == "__main__":
-    # dailyUpdateAllStores()
+    dailyUpdateAllStores()
     # dailyUpdateDatabaseFromEbay("Basset Auto Wreckers")
     # dailyUpdateDatabaseFromEbay("PARTS THAT FIT LLC")
-    dailyUpdateDatabaseFromEbay("M&amp;M Auto Parts, Inc.")
+    # dailyUpdateDatabaseFromEbay("M&amp;M Auto Parts, Inc.")
