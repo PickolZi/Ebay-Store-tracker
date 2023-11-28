@@ -1,13 +1,22 @@
 nav {
-    background: red;
+    background: lightblue;
     display: flex;
     justify-content: space-between;
     align-items: center;
     height: var(--size-6xl);
+    padding: 0 1rem;
 }
 .nav__store-dropdown {
-    /* background: blue; */
     height: var(--size-4xl);
     width: 320px;
-    margin: auto
+    transform: translateX(-25%);
+}
+.nav__calendar-icon {
+    width: var(--size-4xl);
+    height: var(--size-4xl);
+    cursor: pointer;
+    transition: ease-in-out 0.25s transform;
+}
+.nav__calendar-icon:hover {
+    transform: translateY(-0.25rem);
 }

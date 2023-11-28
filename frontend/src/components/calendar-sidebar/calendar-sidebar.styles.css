@@ -1,0 +1,8 @@
+.calendar__sidebar {
+    position: fixed;
+    right: 0;
+    top: var(--size-6xl);
+    width: 320px;
+    height: 100%;
+    background-color: lightgreen;
+}

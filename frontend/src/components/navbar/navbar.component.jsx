@@ -1,8 +1,10 @@
 import { useState, useEffect, useContext } from "react";
 
 import { NavDropdownStoreContext } from '../../context/nav-dropdown-store.context';
+import { CalendarDateContext } from "../../context/calendar-date.context";
 
 import "./navbar.styles.css";
+import CalendarSVG  from "../../assets/calendar.svg";
 
 const Navbar = () => {
     const { navDropdownStore,
@@ -11,6 +13,10 @@ const Navbar = () => {
         setNavDropdownStoreID,
         navDropdownStoreOptions
         } = useContext(NavDropdownStoreContext);
+    const {
+        isCalendarSidebar,
+        setIsCalendarSidebar
+    } = useContext(CalendarDateContext);
 
     // Sets the navDropdown store name and id to its changed value.
     const navDropdownEventHandler = (event) => {
@@ -23,11 +29,9 @@ const Navbar = () => {
         });
     }
 
-    useEffect(() => {
-        console.log("Dropdown option was changed: ");
-        console.log("Store Name: " + navDropdownStore);
-        console.log("Store ID: " + navDropdownStoreID);
-    }, [navDropdownStore]);
+    const toggleCalendarSidebar = () => {
+        setIsCalendarSidebar(!isCalendarSidebar);
+    }
 
     return (
         <nav>
@@ -45,13 +49,12 @@ const Navbar = () => {
                 }
             </select>
 
-            <div className="nav__calendar">
-                <h1>Calendar will go here.</h1>
-            </div>
-
-        
-        </nav>
-        
+            <img 
+                className="nav__calendar-icon" 
+                src={CalendarSVG} 
+                alt="Calendar SVG" 
+                onClick={toggleCalendarSidebar}/>        
+        </nav>        
     )
 }
 
