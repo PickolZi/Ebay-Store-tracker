@@ -1,0 +1,13 @@
+nav {
+    background: red;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: var(--size-6xl);
+}
+.nav__store-dropdown {
+    /* background: blue; */
+    height: var(--size-4xl);
+    width: 320px;
+    margin: auto
+}
