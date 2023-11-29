@@ -1,4 +1,7 @@
-from flask import Blueprint, jsonify
+from flask import Blueprint, jsonify, request
+
+import re
+from datetime import date
 
 from . import db
 from .models import Stores, Items
@@ -53,7 +56,17 @@ def getAllActiveItems(store_id):
 
 @main.route("/api/getAllSoldItems/store/<int:store_id>")
 def getAllSoldItems(store_id):
-    items = Items.query.filter_by(store_id=store_id, status="Sold").order_by("date_last_updated").all()
+    startDate = request.args.get('startDate') if request.args.get('startDate') else ""
+    endDate = request.args.get('endDate') if request.args.get('endDate') else ""
+
+    # Using regex to check if the date is valid.
+    if not re.search(r"^\d{4}-\d{1,2}-\d{1,2}$", startDate):
+        startDate = "2004-01-04"
+
+    if not re.search(r"^\d{4}-\d{1,2}-\d{1,2}$", endDate):
+        endDate = date.today()
+
+    items = Items.query.filter_by(store_id=store_id, status="Sold").order_by("date_sold").filter(Items.date_sold >= startDate).filter(Items.date_sold <= endDate).all()
     active_items_list = []
 
     for item in items:
@@ -77,6 +90,25 @@ def getAllSoldItems(store_id):
         "totalWorth": sum([item["price"] for item in active_items_list])
     })
     
-        
-        
+@main.route("/api/getListedItemsInfo/store/<int:store_id>")
+def getListedItemsInfo(store_id):
+    startDate = request.args.get('startDate') if request.args.get('startDate') else ""
+    endDate = request.args.get('endDate') if request.args.get('endDate') else ""
 
+    # Using regex to check if the date is valid.
+    if not re.search(r"^\d{4}-\d{1,2}-\d{1,2}$", startDate):
+        startDate = "2004-01-04"
+
+    if not re.search(r"^\d{4}-\d{1,2}-\d{1,2}$", endDate):
+        endDate = date.today()
+
+    items = Items.query.filter_by(store_id=store_id).order_by("listed_date").filter(Items.date_sold >= startDate).filter(Items.date_sold <= endDate).all()
+    
+    total_worth = 0
+    for item in items:
+        total_worth += item.price
+        
+    return jsonify({
+        "numOfItems": len(items),
+        "totalWorth": total_worth
+    })
