@@ -1,0 +1,4 @@
+.spreadsheet__titles {
+    display: flex;
+    gap: 1rem;
+}

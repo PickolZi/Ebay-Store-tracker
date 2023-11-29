@@ -102,7 +102,7 @@ def getListedItemsInfo(store_id):
     if not re.search(r"^\d{4}-\d{1,2}-\d{1,2}$", endDate):
         endDate = date.today()
 
-    items = Items.query.filter_by(store_id=store_id).order_by("listed_date").filter(Items.date_sold >= startDate).filter(Items.date_sold <= endDate).all()
+    items = Items.query.filter_by(store_id=store_id).order_by("listed_date").filter(Items.listed_date >= startDate).filter(Items.listed_date <= endDate).all()
     
     total_worth = 0
     for item in items:

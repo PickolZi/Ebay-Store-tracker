@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from 'react';
+import { useEffect, useContext } from 'react';
 
 import { CalendarDateContext } from '../../context/calendar-date.context';
 
@@ -14,10 +14,10 @@ const CalendarSideBar = () => {
         <section className="calendar__sidebar">
             <DatePicker 
                 value={dayjs(startDate)} 
-                onChange={(curDate) => {setStartDate(curDate.toISOString())}} />
+                onChange={(curDate) => {setStartDate(curDate.format("YYYY-MM-DD"))}} />
             <DatePicker 
                 value={dayjs(endDate)} 
-                onChange={(curDate) => {setEndDate(curDate.toISOString())}} />
+                onChange={(curDate) => {setEndDate(curDate.format("YYYY-MM-DD"))}} />
         </section>
     );
 }

@@ -1,0 +1,7 @@
+.dashboard {
+    background-color: var(--clr-secondary-background);
+}
+.card-list {
+    display: flex;
+    justify-content: space-evenly;
+}
