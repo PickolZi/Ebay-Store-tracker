@@ -1,4 +1,39 @@
-.spreadsheet__titles {
+.spreadsheet {
     display: flex;
-    gap: 1rem;
+    flex-direction: column;
+}
+
+.spreadsheet__titles, .spreadsheet__rows {
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+    border: 1px solid black;
+}
+
+/* .spreadsheet__titles {
+    display: flex;
+    justify-content: space-between;
+}
+.spreadsheet__rows {
+    display: flex;
+    justify-content: space-between;
+} */
+
+.spreadsheet__cell {
+    /* outline: 1px solid red; */
+    width: 160px;
+    /* border: 1px solid black; */
+}
+.spreadsheet__rows-title {
+    width: 600px;
+}
+.spreadsheet__rows-title-link:hover {
+    color: blue;
+    cursor: pointer;
+}
+.spreadsheet__rows-picture-link, .spreadsheet__rows-picture {
+    width: 256px;
+}
+.spreadsheet__rows-date_diff {
+    width: 80px;
 }

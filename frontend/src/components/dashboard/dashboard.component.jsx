@@ -55,19 +55,7 @@ const Dashboard = () => {
                 <Card title="Total Sold Items Value" content={"$" + soldItemsWorth} />
             </div>
             
-            <Spreadsheet />
-
-            {soldItemsData && soldItemsData.map((item) => {
-                return (
-                    <div key={item["item_id"]}>
-                        <h1>Title: {item["title"]}</h1>
-                        <p>Make: {item["make"]}</p>
-                        <p>Model: {item["model"]}</p>
-                        <p>Listed date: {item["listed_date"]}</p>
-                        <p>date sold: {item["date_sold"]}</p>
-                    </div>
-                )
-            })}
+            <Spreadsheet soldItemsData={soldItemsData} setSoldItemsData={setSoldItemsData}/>
         </div>
     )
 }
