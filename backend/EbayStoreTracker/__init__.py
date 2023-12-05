@@ -9,7 +9,8 @@ def create_app():
     app.config["SECRET_KEY"] = "192b9bdd22ab9ed4d12e236c78afcb9a393ec15f71bbf5dc987d54727823bcbf"
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.sqlite3'
     
-    CORS(app, origins="http://localhost:5173", supports_credentials=True, methods=['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'])
+    # Changed to Axios to grab data from local api on server.
+    # CORS(app, origins="http://localhost:5173", supports_credentials=True, methods=['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'])
     from .routes import main
 
     db.init_app(app)

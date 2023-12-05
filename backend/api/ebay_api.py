@@ -129,8 +129,14 @@ def loadEbayItemsWithinRange(store, headers, minPrice, maxPrice, output):
             break
         json_data = responseFromGettingAllEbayData(store, generateBodyForGetEbayDataFromStore(store, minPrice, maxPrice, pageNum=page+1), headers)
         # Calls function that picks apart item attiributes for up to 100 ebay items and adds to output list.
-        ebay_items = json_data['findItemsIneBayStoresResponse']['searchResult']['item']
-        addEbayItemToList(ebay_items, output)
+        try:
+            ebay_items = json_data['findItemsIneBayStoresResponse']['searchResult']['item']
+            addEbayItemToList(ebay_items, output)
+        except KeyError:
+            print("Could not find item from page.")
+            print(json_data)
+            print("Continuing...")
+
 
         global global_page_counter
         global_page_counter += 1
@@ -250,6 +256,7 @@ def areSoldItems(total_ebay_ids):
                 results[item_id] = sold_date    
             else:
                 results[item_id] = False
+        print(f"Sold items page: {i+1}/{quotient+1}")
 
     return results
 

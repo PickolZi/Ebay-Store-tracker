@@ -1,11 +1,9 @@
-const MACHINE_IP = "http://localhost:5000";
+import axios from 'axios';
 
 const fetchFromAPIUsingEndpoint = async (endpoint) => {
-    const res = await fetch(MACHINE_IP + endpoint).then((res) => {
-        return res.json();
-    }).then((res) => {
-        return res;
-    });
+    const res = await axios.get(endpoint).then(async (res) => {
+        return res.data;
+    })
 
     return res;
 }
