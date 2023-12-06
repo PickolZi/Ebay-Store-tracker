@@ -1,12 +1,159 @@
 import dayjs from "dayjs";
 
 import "./spreadsheet.styles.css";
+import { useEffect, useState } from "react";
 
 const Spreadsheet = ({soldItemsData, setSoldItemsData}) => {
+    const [isTitleSort, setTitleSort] = useState(false);
+    const [isMakeSort, setMakeSort] = useState(false);
+    const [isModelSort, setModelSort] = useState(false);
+    const [isPriceSort, setPriceSort] = useState(false);
+    const [isListedDateSort, setListedDateSort] = useState(false);
+    const [isDateSoldSort, setDateSoldSort] = useState(false);
+    const [isDaysTillSoldSort, setDaysTillSoldSort] = useState(false);
     
+    const sortArrayAscending = (header) => {
+        // Three conditionals below are dates. Need special sorting algorithm.
+        if (header == "listed_date" || header == "date_sold") {
+            return [...soldItemsData].sort((a, b) => {
+                const dateAInSec = dayjs(a[header]).unix();
+                const dateBInSec = dayjs(b[header]).unix();
+
+                if (dateAInSec > dateBInSec) {
+                    return 1;
+                } else if (dateAInSec < dateBInSec) {
+                    return -1;
+                } else {
+                    return 0;
+                }
+            })
+        } else if (header == "days_till_sold") {
+            return [...soldItemsData].sort((a, b) => {
+                const dateAInSec = dayjs(a["date_sold"]).diff(dayjs(a["listed_date"]), 'days');
+                const dateBInSec = dayjs(b["date_sold"]).diff(dayjs(b["listed_date"]), 'days');
+
+                if (dateAInSec > dateBInSec) {
+                    return 1;
+                } else if (dateAInSec < dateBInSec) {
+                    return -1;
+                } else {
+                    return 0;
+                }
+            })
+        }
+
+        // Rest are plain text or numbers.
+        return [...soldItemsData].sort((a, b) => {
+            if (a[header] > b[header]) {
+                return 1;
+            } else if (a[header] < b[header]) {
+                return -1;
+            } else {
+                return 0;
+            }
+        })
+    }
+
+    const sortArrayDescending = (header) => {
+        // Three conditionals below are dates. Need special sorting algorithm.
+        if (header == "listed_date" || header == "date_sold") {
+            return [...soldItemsData].sort((a, b) => {
+                const dateAInSec = dayjs(a[header]).unix();
+                const dateBInSec = dayjs(b[header]).unix();
+
+                if (dateAInSec > dateBInSec) {
+                    return -1;
+                } else if (dateAInSec < dateBInSec) {
+                    return 1;
+                } else {
+                    return 0;
+                }
+            })
+        } else if (header == "days_till_sold") {
+            return [...soldItemsData].sort((a, b) => {
+                const dateAInSec = dayjs(a["date_sold"]).diff(dayjs(a["listed_date"]), 'days');
+                const dateBInSec = dayjs(b["date_sold"]).diff(dayjs(b["listed_date"]), 'days');
+
+                if (dateAInSec > dateBInSec) {
+                    return -1;
+                } else if (dateAInSec < dateBInSec) {
+                    return 1;
+                } else {
+                    return 0;
+                }
+            })
+        }
+
+        // Rest are plain text or numbers.
+        return [...soldItemsData].sort((a, b) => {
+            if (a[header] > b[header]) {
+                return -1;
+            } else if (a[header] < b[header]) {
+                return 1;
+            } else {
+                return 0;
+            }
+        })
+    }
+
     const setSoldItemsDataHandler = (event) => {
-        console.log(event.target.textContent)
-        // setSoldItemsData()
+        const clicked = event.target.textContent;
+        let sortedItems = []
+
+        if (clicked == "Picture") {
+            return;
+        } else if (clicked == "Title") {
+            setTitleSort(!isTitleSort);
+            if (isTitleSort) {
+                sortedItems = sortArrayAscending("title");
+            } else {
+                sortedItems = sortArrayDescending("title");
+            }
+        } else if (clicked == "Make") {
+            setMakeSort(!isMakeSort);
+            if (isMakeSort) {
+                sortedItems = sortArrayAscending("make");
+            } else {
+                sortedItems = sortArrayDescending("make");
+            }
+        } else if (clicked == "Model") {
+            setModelSort(!isModelSort);
+            if (isModelSort) {
+                sortedItems = sortArrayAscending("model");
+            } else {
+                sortedItems = sortArrayDescending("model");
+            }
+        } else if (clicked == "Price") {
+            setPriceSort(!isPriceSort);
+            if (isPriceSort) {
+                sortedItems = sortArrayAscending("price");
+            } else {
+                sortedItems = sortArrayDescending("price");
+            }
+        } else if (clicked == "Listed date") {
+            setListedDateSort(!isListedDateSort);
+            if (isListedDateSort) {
+                sortedItems = sortArrayAscending("listed_date");
+            } else {
+                sortedItems = sortArrayDescending("listed_date");
+            }
+        } else if (clicked == "Date sold") {
+            setDateSoldSort(!isDateSoldSort);
+            if (isDateSoldSort) {
+                sortedItems = sortArrayAscending("date_sold");
+            } else {
+                sortedItems = sortArrayDescending("date_sold");
+            }
+        } else if (clicked == "Days till sold") {
+            setDaysTillSoldSort(!isDaysTillSoldSort);
+            if (isDaysTillSoldSort) {
+                sortedItems = sortArrayAscending("days_till_sold");
+            } else {
+                sortedItems = sortArrayDescending("days_till_sold");
+            }
+        }
+
+        setSoldItemsData(sortedItems);
     }
 
     return (
